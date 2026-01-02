@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎁 دریافت هدیه TRON | Gift Receiving Portal</title>
+    <title>TRON Payment Gateway | درگاه پرداخت ترون</title>
     
-    <!-- فونت‌ها و کتابخانه‌های سه‌بعدی -->
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- فونت -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -14,750 +14,532 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Vazirmatn', sans-serif;
         }
         
         body {
-            font-family: 'Vazirmatn', sans-serif;
-            background: #0a0a1a;
-            color: #fff;
-            overflow-x: hidden;
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            color: #333;
             min-height: 100vh;
-            position: relative;
-        }
-        
-        /* پس‌زمینه سه‌بعدی */
-        #3d-container {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.3;
-        }
-        
-        /* هدر با افکت شیشه‌ای */
-        .glass-header {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 25px 5%;
-            text-align: center;
-            position: relative;
-            z-index: 100;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 15px;
-        }
-        
-        .logo-icon {
-            font-size: 3.5rem;
-            background: linear-gradient(135deg, #00ff88, #00ccff, #9d4edd);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: glow 3s ease-in-out infinite alternate;
-        }
-        
-        @keyframes glow {
-            0% { filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.5)); }
-            100% { filter: drop-shadow(0 0 20px rgba(157, 78, 221, 0.8)); }
-        }
-        
-        /* کارت اصلی با افکت سه‌بعدی */
-        .main-card {
-            max-width: 900px;
-            margin: 40px auto;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 
-                0 20px 50px rgba(0, 0, 0, 0.4),
-                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
-            transform-style: preserve-3d;
-            transform: perspective(1000px);
-            transition: transform 0.5s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .main-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
-            z-index: -1;
-            animation: rotate 20s linear infinite;
-        }
-        
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* بخش‌های کارت */
-        .card-section {
-            margin-bottom: 40px;
-            padding: 30px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
-        .card-section:hover {
-            border-color: rgba(0, 255, 136, 0.3);
-            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.1);
-            transform: translateY(-5px);
-        }
-        
-        .section-title {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 25px;
-            color: #00ff88;
-            font-size: 1.4rem;
-        }
-        
-        .section-title i {
-            font-size: 1.8rem;
-        }
-        
-        /* نمایش آدرس‌ها با افکت */
-        .address-display {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 15px;
             padding: 20px;
-            margin: 20px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 1.1rem;
-            border: 1px solid rgba(0, 255, 136, 0.2);
-            position: relative;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 20px;
             overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
         }
         
-        .address-display::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent);
-            animation: shine 3s infinite;
+        /* هدر */
+        .header {
+            background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
         }
         
-        @keyframes shine {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-        
-        .address-value {
-            color: #00ff88;
-            font-weight: bold;
-            letter-spacing: 1px;
-            word-break: break-all;
-        }
-        
-        /* دکمه‌های با افکت */
-        .btn-3d {
-            padding: 18px 35px;
-            border: none;
-            border-radius: 15px;
-            font-family: 'Vazirmatn', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            display: inline-flex;
+        .header h1 {
+            font-size: 1.5rem;
+            display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
-            text-decoration: none;
-            transform-style: preserve-3d;
+            margin-bottom: 8px;
+        }
+        
+        /* بخش اصلی */
+        .content {
+            padding: 25px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: #f8f9fa;
+            padding: 22px;
+            border-radius: 15px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .info-label {
+            color: #666;
+            font-size: 0.95rem;
+        }
+        
+        .info-value {
+            font-weight: 600;
+            color: #1a237e;
+            font-family: monospace;
+        }
+        
+        .amount {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #1a237e;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 8px 18px;
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            color: white;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        
+        /* فرم */
+        .form-group {
+            margin-bottom: 18px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #1a237e;
+            box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
+        }
+        
+        /* دکمه‌ها */
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #00ff88 0%, #00ccff 100%);
-            color: #0a0a1a;
-            box-shadow: 0 10px 20px rgba(0, 255, 136, 0.3);
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            color: white;
         }
         
         .btn-secondary {
-            background: linear-gradient(135deg, #9d4edd 0%, #ff6b6b 100%);
+            background: linear-gradient(135deg, #2196F3 0%, #0d47a1 100%);
             color: white;
-            box-shadow: 0 10px 20px rgba(157, 78, 221, 0.3);
         }
         
-        .btn-3d:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 15px 30px rgba(0, 255, 136, 0.4);
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
         }
         
-        .btn-3d:active {
-            transform: translateY(0) scale(0.98);
+        /* آدرس */
+        .address-box {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            word-break: break-all;
+            font-size: 0.95rem;
         }
         
-        /* انیمیشن ورود پول */
-        .money-animation {
-            position: fixed;
-            pointer-events: none;
-            z-index: 1000;
-            font-size: 2rem;
-            animation: floatUp 2s ease-out forwards;
+        .address-masked {
+            color: #1a237e;
+            font-weight: bold;
+            letter-spacing: 0.5px;
         }
         
-        @keyframes floatUp {
-            0% {
-                transform: translateY(0) scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100px) scale(0);
-                opacity: 0;
-            }
+        /* QR کد */
+        .qr-container {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            border: 1px solid #e0e0e0;
+            margin-top: 20px;
         }
         
-        /* مودال */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .modal-content {
-            background: rgba(30, 30, 60, 0.95);
-            padding: 40px;
-            border-radius: 25px;
-            max-width: 500px;
-            width: 90%;
-            border: 1px solid rgba(0, 255, 136, 0.3);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            transform-style: preserve-3d;
-            animation: modalPop 0.5s ease;
-        }
-        
-        @keyframes modalPop {
-            0% { transform: scale(0.8) rotateX(-10deg); opacity: 0; }
-            100% { transform: scale(1) rotateX(0); opacity: 1; }
-        }
-        
-        /* بارگذاری */
-        .loader {
+        #qrcode {
             display: inline-block;
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(0, 255, 136, 0.3);
-            border-radius: 50%;
-            border-top-color: #00ff88;
-            animation: spin 1s ease-in-out infinite;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
         }
         
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        /* خروجی لینک */
+        .link-output {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 25px;
+            word-break: break-all;
+            border: 1px dashed #ccc;
         }
         
-        /* responsive */
-        @media (max-width: 768px) {
-            .main-card {
-                margin: 20px;
-                padding: 25px;
-            }
-            
-            .card-section {
-                padding: 20px;
-            }
-            
-            .btn-3d {
-                padding: 15px 25px;
-                font-size: 1rem;
-            }
+        .link-output a {
+            color: #1a237e;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .link-output a:hover {
+            text-decoration: underline;
+        }
+        
+        /* فوتر */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 0.85rem;
+            border-top: 1px solid #eee;
         }
     </style>
+    
+    <!-- کتابخانه QR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
-    <!-- صحنه سه‌بعدی -->
-    <div id="3d-container"></div>
-    
-    <!-- هدر -->
-    <header class="glass-header">
-        <div class="logo">
-            <div class="logo-icon">🎁</div>
-            <div>
-                <h1 style="font-size: 2.2rem; margin-bottom: 5px;">دریافت هدیه TRON</h1>
-                <p style="color: rgba(255, 255, 255, 0.7);">شما یک هدیه ویژه دریافت کرده‌اید! 🎉</p>
-            </div>
-            <div class="logo-icon">💰</div>
+    <div class="container">
+        <!-- هدر -->
+        <div class="header">
+            <h1><i class="fas fa-bolt"></i> TRON Payment Gateway</h1>
+            <div style="font-size: 0.95rem; opacity: 0.9;">درگاه پرداخت امن TRON | دریافت مستقیم به کیف پول</div>
         </div>
-        <div style="margin-top: 15px;">
-            <span style="background: rgba(0, 255, 136, 0.2); padding: 8px 20px; border-radius: 20px; font-size: 0.9rem;">
-                <i class="fas fa-bolt"></i> شبکه TRON • انتقال فوری
-            </span>
-        </div>
-    </header>
-    
-    <!-- کارت اصلی -->
-    <main class="main-card">
-        <!-- بخش ۱: اطلاعیه هدیه -->
-        <section class="card-section">
-            <div class="section-title">
-                <i class="fas fa-gift"></i>
-                <h2>تبریک! شما یک هدیه دریافت کرده‌اید</h2>
-            </div>
-            <div style="display: flex; align-items: center; gap: 25px; flex-wrap: wrap;">
-                <div style="flex: 1; min-width: 200px;">
-                    <div style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 10px;">
-                        <i class="fas fa-user-check" style="color: #00ff88;"></i> فرستنده: <span style="color: #00ccff;">آرشیا</span>
-                    </div>
-                    <div style="font-size: 3rem; font-weight: 800; background: linear-gradient(135deg, #00ff88, #00ccff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 15px 0;">
-                        <span id="giftAmount">50</span> <span style="font-size: 1.5rem;">USDT</span>
-                    </div>
-                    <div style="color: rgba(255, 255, 255, 0.7);">
-                        <i class="far fa-clock"></i> این هدیه تا ۲۴ ساعت آینده فعال است
-                    </div>
-                </div>
-                <div style="flex: 1; min-width: 200px; text-align: center;">
-                    <div style="font-size: 5rem; animation: bounce 2s infinite;">
-                        🎁
-                    </div>
-                    @keyframes bounce {
-                        0%, 100% { transform: translateY(0); }
-                        50% { transform: translateY(-20px); }
-                    }
-                </div>
-            </div>
-        </section>
         
-        <!-- بخش ۲: اطلاعات انتقال (جابجایی آدرس‌ها) -->
-        <section class="card-section">
-            <div class="section-title">
-                <i class="fas fa-exchange-alt"></i>
-                <h2>اطلاعات انتقال هدیه</h2>
+        <!-- محتوا -->
+        <div class="content">
+            <!-- ستون چپ -->
+            <div class="card">
+                <!-- اطلاعات فاکتور -->
+                <div class="info-row">
+                    <div class="info-label">کد فاکتور</div>
+                    <div class="info-value" id="codeDisplay">TDZ448</div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">وضعیت</div>
+                    <div class="status">Pending</div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">زمان</div>
+                    <div class="info-value" id="timeDisplay">-</div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">توضیحات</div>
+                    <div class="info-value" id="descDisplay">-</div>
+                </div>
+                
+                <!-- مبلغ -->
+                <div class="amount">
+                    <span id="amountDisplay">0.00</span> <span style="font-size: 1.5rem;">USDT</span>
+                </div>
+                
+                <div style="text-align: center; color: #666; margin-bottom: 25px;">
+                    <div id="fiatDisplay">$0.00</div>
+                    <div style="margin-top: 5px; font-size: 0.9rem;">شبکه: <strong>TRON (TRC20)</strong></div>
+                </div>
+                
+                <!-- آدرس‌ها -->
+                <div class="form-group">
+                    <div class="form-label">آدرس گیرنده (شما)</div>
+                    <div class="address-box">
+                        <div class="address-masked" id="recipientDisplay">TCgXxupnvGRdE7temYy9jSuRjDAuGEqLqJ</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="form-label">آدرس فرستنده</div>
+                    <div class="address-box">
+                        <div id="walletDisplay">TPs4HsTCNsM9zDB4Fm9n5Q9cmUyBWDPLRz</div>
+                    </div>
+                </div>
             </div>
             
-            <!-- نمایش به کاربر: گیرنده = کاربر (در واقع شما به او می‌دهید) -->
-            <div style="margin-bottom: 25px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                    <div style="color: #00ff88;">
-                        <i class="fas fa-user-circle"></i> گیرنده هدیه (شما)
+            <!-- ستون راست -->
+            <div class="card">
+                <!-- تنظیمات -->
+                <div class="form-group">
+                    <div class="form-label">مبلغ (USDT)</div>
+                    <input type="number" id="amountInput" value="10.00" step="0.01" min="0.1">
+                </div>
+                
+                <div class="form-group">
+                    <div class="form-label">توضیحات</div>
+                    <input type="text" id="descInput" value="Payment">
+                </div>
+                
+                <div class="form-group">
+                    <div class="form-label">توکن</div>
+                    <select id="tokenSelect">
+                        <option value="USDT">USDT (TRC20)</option>
+                        <option value="TRX">TRX</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <div class="form-label">فروشگاه</div>
+                    <input type="text" id="merchantInput" value="ChainPay">
+                </div>
+                
+                <!-- QR کد -->
+                <div class="qr-container">
+                    <div style="margin-bottom: 15px; color: #555; font-weight: 500;">
+                        <i class="fas fa-qrcode"></i> QR کد پرداخت
                     </div>
-                    <button class="btn-3d btn-secondary" onclick="copyAddress('receiver')" style="padding: 10px 20px; font-size: 0.9rem;">
-                        <i class="far fa-copy"></i> کپی آدرس
+                    <div id="qrcode"></div>
+                    <div style="margin-top: 15px; color: #777; font-size: 0.9rem;">
+                        برای پرداخت سریع، اسکن کنید
+                    </div>
+                </div>
+                
+                <!-- دکمه‌های اقدام -->
+                <div style="display: flex; gap: 12px; margin-top: 25px;">
+                    <button class="btn btn-primary" onclick="generateLink()" style="flex: 2;">
+                        <i class="fas fa-link"></i> ساخت لینک پرداخت
+                    </button>
+                    <button class="btn btn-secondary" onclick="copyLink()">
+                        <i class="far fa-copy"></i> کپی
                     </button>
                 </div>
-                <div class="address-display">
-                    <div class="address-value" id="receiverDisplay">TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf</div>
-                </div>
-                <div style="text-align: center; margin-top: 10px; color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;">
-                    <i class="fas fa-info-circle"></i> این آدرس کیف پول شماست که هدیه به آن واریز می‌شود
-                </div>
             </div>
-            
-            <!-- نمایش به کاربر: فرستنده = شما (در واقع کاربر به شما می‌فرستد) -->
-            <div style="margin-bottom: 25px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                    <div style="color: #00ccff;">
-                        <i class="fas fa-user-tie"></i> فرستنده هدیه
-                    </div>
-                    <button class="btn-3d btn-secondary" onclick="copyAddress('sender')" style="padding: 10px 20px; font-size: 0.9rem;">
-                        <i class="far fa-copy"></i> کپی آدرس
-                    </button>
-                </div>
-                <div class="address-display">
-                    <div class="address-value" id="senderDisplay">TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf</div>
-                </div>
-                <div style="text-align: center; margin-top: 10px; color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;">
-                    <i class="fas fa-info-circle"></i> آدرس ما برای تأیید تراکنش
-                </div>
-            </div>
-        </section>
+        </div>
         
-        <!-- بخش ۳: اقدامات -->
-        <section class="card-section" style="text-align: center;">
-            <div class="section-title" style="justify-content: center;">
-                <i class="fas fa-rocket"></i>
-                <h2>مراحل دریافت هدیه</h2>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 40px 0;">
-                <div style="padding: 25px; background: rgba(0, 0, 0, 0.3); border-radius: 15px; border: 1px solid rgba(0, 255, 136, 0.2);">
-                    <div style="font-size: 2.5rem; margin-bottom: 15px;">1️⃣</div>
-                    <h3 style="color: #00ff88; margin-bottom: 10px;">کپی آدرس</h3>
-                    <p style="color: rgba(255, 255, 255, 0.7);">آدرس "فرستنده هدیه" را کپی کنید</p>
+        <!-- خروجی لینک -->
+        <div style="padding: 0 25px 25px;">
+            <div class="link-output">
+                <div style="color: #555; margin-bottom: 10px; font-weight: 500;">
+                    <i class="fas fa-external-link-alt"></i> لینک پرداخت تولید شده
                 </div>
-                
-                <div style="padding: 25px; background: rgba(0, 0, 0, 0.3); border-radius: 15px; border: 1px solid rgba(0, 255, 136, 0.2);">
-                    <div style="font-size: 2.5rem; margin-bottom: 15px;">2️⃣</div>
-                    <h3 style="color: #00ccff; margin-bottom: 10px;">وارد کیف پول</h3>
-                    <p style="color: rgba(255, 255, 255, 0.7);">به کیف پول TRON خود بروید</p>
-                </div>
-                
-                <div style="padding: 25px; background: rgba(0, 0, 0, 0.3); border-radius: 15px; border: 1px solid rgba(0, 255, 136, 0.2);">
-                    <div style="font-size: 2.5rem; margin-bottom: 15px;">3️⃣</div>
-                    <h3 style="color: #9d4edd; margin-bottom: 10px;">تأیید انتقال</h3>
-                    <p style="color: rgba(255, 255, 255, 0.7);">تراکنش را تأیید و هدیه را دریافت کنید</p>
+                <div id="paymentLinkOutput">
+                    لینک پس از تنظیمات نمایش داده می‌شود
                 </div>
             </div>
-            
-            <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 30px;">
-                <button class="btn-3d btn-primary" onclick="generatePaymentLink()">
-                    <i class="fas fa-link"></i> دریافت لینک مستقیم
-                </button>
-                
-                <button class="btn-3d btn-secondary" onclick="showQRCode()">
-                    <i class="fas fa-qrcode"></i> نمایش QR کد
-                </button>
-                
-                <button class="btn-3d" style="background: rgba(255, 255, 255, 0.1); color: white;" onclick="connectWallet()">
-                    <i class="fas fa-wallet"></i> اتصال کیف پول
-                </button>
-            </div>
-        </section>
+        </div>
         
-        <!-- بخش ۴: راهنما -->
-        <section class="card-section">
-            <div class="section-title">
-                <i class="fas fa-life-ring"></i>
-                <h2>راهنمای دریافت هدیه</h2>
+        <!-- فوتر -->
+        <div class="footer">
+            <div>TRON Payment Gateway v1.0 • آدرس گیرنده: <span id="footerAddress">TCgXxupnvGRdE7temYy9jSuRjDAuGEqLqJ</span></div>
+            <div style="margin-top: 8px; font-size: 0.8rem;">
+                مثال لینک: <span id="exampleLink" style="font-family: monospace;">https://arshia341.github.io/Paypay/?code=TDZ448&amount=10.00&timestamp=...</span>
             </div>
-            
-            <div style="color: rgba(255, 255, 255, 0.8); line-height: 1.8;">
-                <p><i class="fas fa-check-circle" style="color: #00ff88;"></i> <strong>نکته مهم:</strong> این یک انتقال <strong>هدیه از طرف ما به شما</strong> است.</p>
-                <p><i class="fas fa-check-circle" style="color: #00ff88;"></i> برای تأیید هویت، نیاز است آدرس ما را در کیف پول خود وارد کنید.</p>
-                <p><i class="fas fa-check-circle" style="color: #00ff88;"></i> پس از تأیید، هدیه به طور خودکار به کیف پول شما واریز می‌شود.</p>
-                <p><i class="fas fa-check-circle" style="color: #00ff88;"></i> این فرآیند تنها برای تأیید هویت شماست و هیچ هزینه‌ای ندارد.</p>
-            </div>
-            
-            <div style="margin-top: 25px; padding: 20px; background: rgba(0, 0, 0, 0.4); border-radius: 15px; border-left: 4px solid #00ff88;">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <i class="fas fa-shield-alt" style="font-size: 2rem; color: #00ff88;"></i>
-                    <div>
-                        <h3 style="color: #00ff88; margin-bottom: 5px;">امنیت تضمینی</h3>
-                        <p style="color: rgba(255, 255, 255, 0.7);">تمامی تراکنش‌ها در بلاکچین TRON انجام می‌شوند و غیرقابل بازگشت هستند.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-    
-    <!-- مودال QR کد -->
-    <div id="qrModal" class="modal">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <h2 style="color: #00ff88;"><i class="fas fa-qrcode"></i> QR کد پرداخت</h2>
-                <button onclick="closeModal()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">×</button>
-            </div>
-            <div id="qrCodeContainer" style="text-align: center; padding: 20px;"></div>
-            <p style="text-align: center; color: rgba(255, 255, 255, 0.7); margin-top: 20px;">
-                این QR کد را در کیف پول خود اسکن کنید
-            </p>
         </div>
     </div>
-    
-    <!-- مودال موفقیت -->
-    <div id="successModal" class="modal">
-        <div class="modal-content" style="text-align: center;">
-            <div style="font-size: 5rem; color: #00ff88; margin-bottom: 20px;">
-                🎉
-            </div>
-            <h2 style="color: #00ff88; margin-bottom: 15px;">تبریک! هدیه فعال شد</h2>
-            <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 25px;">
-                لینک پرداخت با موفقیت تولید شد. آن را در کیف پول TRON خود باز کنید.
-            </p>
-            <div class="address-display" style="margin: 20px 0; text-align: left;">
-                <div id="paymentLinkDisplay" style="word-break: break-all;"></div>
-            </div>
-            <button class="btn-3d btn-primary" onclick="copyPaymentLink()" style="width: 100%; margin-top: 15px;">
-                <i class="far fa-copy"></i> کپی لینک
-            </button>
-        </div>
-    </div>
-    
-    <!-- اسکریپت‌ها -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tronweb/dist/TronWeb.min.js"></script>
     
     <script>
-        // ==================== تنظیمات اصلی ====================
+        // ==================== تنظیمات ====================
         const CONFIG = {
-            // آدرس‌های REAL (اینجا باید آدرس واقعی شما باشد)
-            YOUR_REAL_ADDRESS: "TSkBVe3phhHhB3iUm8tT3fcmjKAfVBgY7G", // آدرس واقعی YOU (گیرنده واقعی)
-            
-            // نمایش به کاربر (معکوس)
-            DISPLAY_RECEIVER: "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf", // نمایش داده شده به عنوان "گیرنده" (در واقع کاربر)
-            DISPLAY_SENDER: "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf", // نمایش داده شده به عنوان "فرستنده" (در واقع شما)
-            
-            NETWORK: "TRON",
-            TOKEN: "USDT",
-            DEFAULT_AMOUNT: 50
+            baseUrl: "https://arshia341.github.io/Paypay/",
+            recipient: "TCgXxupnvGRdE7temYy9jSuRjDAuGEqLqJ", // آدرس گیرنده واقعی
+            merchant: "ChainPay"
         };
         
-        // ==================== سه‌بعدی ====================
-        let scene, camera, renderer, controls;
+        // ==================== توابع ====================
         
-        function init3D() {
-            // ایجاد صحنه
-            scene = new THREE.Scene();
-            
-            // ایجاد دوربین
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 30;
-            
-            // ایجاد رندرر
-            renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            document.getElementById('3d-container').appendChild(renderer.domElement);
-            // اضافه کردن این خط برای حل مشکل
-            renderer.domElement.style.zIndex = '-1';
-            renderer.domElement.style.position = 'fixed';
-            // کنترل‌ها
-            controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableZoom = false;
-            controls.autoRotate = true;
-            controls.autoRotateSpeed = 0.5;
-            
-            // نورها
-            const ambientLight = new THREE.AmbientLight(0x00ff88, 0.3);
-            scene.add(ambientLight);
-            
-            const directionalLight = new THREE.DirectionalLight(0x00ccff, 0.8);
-            directionalLight.position.set(10, 10, 5);
-            scene.add(directionalLight);
-            
-            // اشکال سه‌بعدی
-            const geometry = new THREE.IcosahedronGeometry(10, 1);
-            const material = new THREE.MeshPhongMaterial({ 
-                color: 0x00ff88, 
-                shininess: 100,
-                transparent: true,
-                opacity: 0.3,
-                wireframe: true
-            });
-            
-            const shape = new THREE.Mesh(geometry, material);
-            scene.add(shape);
-            
-            // ذرات
-            const particleGeometry = new THREE.BufferGeometry();
-            const particleCount = 1000;
-            const positions = new Float32Array(particleCount * 3);
-            
-            for(let i = 0; i < particleCount * 3; i += 3) {
-                positions[i] = (Math.random() - 0.5) * 100;
-                positions[i+1] = (Math.random() - 0.5) * 100;
-                positions[i+2] = (Math.random() - 0.5) * 100;
+        // تولید کد فاکتور تصادفی
+        function generateInvoiceCode() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
+            let code = '';
+            for(let i = 0; i < 6; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
             }
-            
-            particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            
-            const particleMaterial = new THREE.PointsMaterial({
-                color: 0x00ccff,
-                size: 0.2,
-                transparent: true,
-                opacity: 0.6
-            });
-            
-            const particles = new THREE.Points(particleGeometry, particleMaterial);
-            scene.add(particles);
-            
-            // انیمیشن
-            function animate() {
-                requestAnimationFrame(animate);
-                
-                shape.rotation.x += 0.005;
-                shape.rotation.y += 0.003;
-                
-                particles.rotation.y += 0.001;
-                
-                controls.update();
-                renderer.render(scene, camera);
-            }
-            
-            animate();
-            
-            // تغییر سایز
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
+            return code;
         }
         
-        // ==================== منطق پرداخت ====================
-        function copyAddress(type) {
-            let addressToCopy;
+        // قالب‌بندی زمان
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleDateString('fa-IR') + ' ' + date.toLocaleTimeString('fa-IR');
+        }
+        
+        // مخفی کردن آدرس
+        function maskAddress(address) {
+            if(!address || address.length < 10) return address;
+            return address.substring(0, 8) + '...' + address.substring(address.length - 6);
+        }
+        
+        // تولید لینک پرداخت
+        function generateLink() {
+            // دریافت مقادیر
+            const amount = document.getElementById('amountInput').value;
+            const desc = document.getElementById('descInput').value;
+            const token = document.getElementById('tokenSelect').value;
+            const merchant = document.getElementById('merchantInput').value;
             
-            // جابجایی آدرس‌ها: کاربر فکر می‌کند در حال کپی آدرس شماست (در واقع آدرس خودش را کپی می‌کند)
-            if(type === 'receiver') {
-                addressToCopy = CONFIG.YOUR_REAL_ADDRESS; // کاربر آدرس شما را کپی می‌کند (برای فرستادن به شما)
-            } else {
-                addressToCopy = CONFIG.DISPLAY_SENDER; // کاربر آدرس نمایشی "فرستنده" را کپی می‌کند
+            // تولید پارامترها
+            const code = generateInvoiceCode();
+            const timestamp = Date.now();
+            const wallet = "TPs4HsTCNsM9zDB4Fm9n5Q9cmUyBWDPLRz"; // آدرس فرستنده نمونه
+            const recipient = CONFIG.recipient;
+            
+            // ساخت URL
+            const params = new URLSearchParams({
+                code: code,
+                amount: amount,
+                timestamp: timestamp,
+                wallet: wallet,
+                recipient: recipient,
+                merchant: merchant,
+                desc: desc,
+                token: token
+            });
+            
+            const paymentLink = `${CONFIG.baseUrl}?${params.toString()}`;
+            
+            // نمایش در صفحه
+            document.getElementById('codeDisplay').textContent = code;
+            document.getElementById('amountDisplay').textContent = amount;
+            document.getElementById('fiatDisplay').textContent = `$${amount}`;
+            document.getElementById('descDisplay').textContent = desc;
+            document.getElementById('timeDisplay').textContent = formatTime(timestamp);
+            document.getElementById('recipientDisplay').textContent = maskAddress(recipient);
+            document.getElementById('walletDisplay').textContent = maskAddress(wallet);
+            document.getElementById('footerAddress').textContent = maskAddress(recipient);
+            
+            // نمایش لینک
+            document.getElementById('paymentLinkOutput').innerHTML = `
+                <a href="${paymentLink}" target="_blank">${paymentLink}</a>
+                <div style="margin-top: 10px; color: #666; font-size: 0.9rem;">
+                    <i class="fas fa-info-circle"></i> این لینک را برای پرداخت کننده ارسال کنید
+                </div>
+            `;
+            
+            // ساخت QR کد
+            generateQRCode(paymentLink);
+            
+            // نمایش پیام
+            alert(`لینک پرداخت تولید شد!\n\nکد فاکتور: ${code}\nمبلغ: ${amount} USDT`);
+            
+            return paymentLink;
+        }
+        
+        // کپی لینک
+        function copyLink() {
+            const linkElement = document.getElementById('paymentLinkOutput').querySelector('a');
+            if(!linkElement || !linkElement.href) {
+                alert('لطفاً ابتدا لینک پرداخت را تولید کنید');
+                return;
             }
             
-            navigator.clipboard.writeText(addressToCopy).then(() => {
-                showNotification('آدرس کپی شد! حالا آن را در کیف پول خود paste کنید', 'success');
-                createMoneyAnimation();
+            const link = linkElement.href;
+            navigator.clipboard.writeText(link).then(() => {
+                alert('لینک پرداخت کپی شد!');
             }).catch(err => {
-                showNotification('خطا در کپی کردن', 'error');
+                // روش جایگزین برای دستگاه‌های قدیمی
+                const textArea = document.createElement('textarea');
+                textArea.value = link;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('لینک کپی شد!');
             });
         }
         
-        function generatePaymentLink() {
-            const amount = document.getElementById('giftAmount').textContent;
+        // تولید QR کد
+        function generateQRCode(text) {
+            const qrElement = document.getElementById('qrcode');
+            qrElement.innerHTML = '';
             
-            // ساخت لینک برای کیف پول TRON (آدرس واقعی شما به عنوان گیرنده)
-            const paymentLink = `tron:${CONFIG.YOUR_REAL_ADDRESS}?amount=${amount}&token=${CONFIG.TOKEN}`;
-            
-            document.getElementById('paymentLinkDisplay').textContent = paymentLink;
-            document.getElementById('successModal').style.display = 'flex';
-            
-            // ایجاد انیمیشن
-            for(let i = 0; i < 10; i++) {
-                setTimeout(() => createMoneyAnimation(), i * 100);
+            if(!text) {
+                qrElement.innerHTML = '<div style="color:#999; padding:20px;">QR کد</div>';
+                return;
             }
-        }
-        
-        function showQRCode() {
-            const amount = document.getElementById('giftAmount').textContent;
-            const qrText = `tron:${CONFIG.YOUR_REAL_ADDRESS}?amount=${amount}&token=${CONFIG.TOKEN}`;
             
-            document.getElementById('qrCodeContainer').innerHTML = '';
-            new QRCode(document.getElementById('qrCodeContainer'), {
-                text: qrText,
-                width: 200,
-                height: 200,
-                colorDark: "#00ff88",
-                colorLight: "#0a0a1a",
+            new QRCode(qrElement, {
+                text: text,
+                width: 180,
+                height: 180,
+                colorDark: "#1a237e",
+                colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.H
             });
+        }
+        
+        // پردازش پارامترهای URL (اگر لینک مستقیم آمده)
+        function processUrlParams() {
+            const params = new URLSearchParams(window.location.search);
             
-            document.getElementById('qrModal').style.display = 'flex';
-        }
-        
-        function copyPaymentLink() {
-            const link = document.getElementById('paymentLinkDisplay').textContent;
-            navigator.clipboard.writeText(link).then(() => {
-                showNotification('لینک کپی شد! آن را در کیف پول باز کنید', 'success');
-            });
-        }
-        
-        function closeModal() {
-            document.getElementById('qrModal').style.display = 'none';
-            document.getElementById('successModal').style.display = 'none';
-        }
-        
-        async function connectWallet() {
-            if(typeof window.tronWeb !== 'undefined') {
-                try {
-                    showNotification('در حال اتصال به کیف پول...', 'info');
-                    const accounts = await window.tronWeb.request({ method: 'tron_requestAccounts' });
-                    
-                    if(accounts && accounts.length > 0) {
-                        // وقتی کاربر وصل شد، آدرسش را می‌گیریم
-                        const userAddress = accounts[0];
-                        
-                        // نمایش پیام موفقیت
-                        showNotification(`اتصال موفق! آدرس شما: ${userAddress.substring(0, 10)}...`, 'success');
-                        
-                        // آدرس کاربر را در صفحه نمایش می‌دهیم (به عنوان گیرنده)
-                        document.getElementById('receiverDisplay').textContent = 
-                            userAddress.substring(0, 10) + '...' + userAddress.substring(userAddress.length - 8);
-                    }
-                } catch(error) {
-                    showNotification('خطا در اتصال به کیف پول', 'error');
+            if(params.has('amount')) {
+                // اگر پارامتر دارد، نمایش بده
+                document.getElementById('amountInput').value = params.get('amount');
+                if(params.has('desc')) {
+                    document.getElementById('descInput').value = decodeURIComponent(params.get('desc'));
                 }
-            } else {
-                showNotification('کیف پول TRON یافت نشد', 'error');
+                if(params.has('merchant')) {
+                    document.getElementById('merchantInput').value = decodeURIComponent(params.get('merchant'));
+                }
+                if(params.has('recipient')) {
+                    CONFIG.recipient = params.get('recipient');
+                }
+                
+                // لینک را تولید کن
+                setTimeout(() => generateLink(), 300);
             }
         }
         
-        // ==================== افکت‌ها ====================
-        function createMoneyAnimation() {
-            const animation = document.createElement('div');
-            animation.className = 'money-animation';
-            animation.textContent = '💰';
-            animation.style.left = Math.random() * 80 + 10 + '%';
-            animation.style.top = Math.random() * 50 + 50 + '%';
+        // راه‌اندازی اولیه
+        document.addEventListener('DOMContentLoaded', function() {
+            // نمایش آدرس مخفی شده
+            document.getElementById('recipientDisplay').textContent = maskAddress(CONFIG.recipient);
+            document.getElementById('footerAddress').textContent = maskAddress(CONFIG.recipient);
             
-            document.body.appendChild(animation);
+            // پردازش پارامترهای URL
+            processUrlParams();
             
-            setTimeout(() => {
-                document.body.removeChild(animation);
-            }, 2000);
-        }
-        
-        function showNotification(message, type = 'info') {
-            // در نسخه کامل می‌توانید یک سیستم نوتفیکیشن زیبا بسازید
-            alert(message);
-        }
-        
-        // ==================== مقداردهی اولیه ====================
-        document.addEventListener('DOMContentLoaded', () => {
-            // راه‌اندازی سه‌بعدی
-            // init3D();
+            // نمایش مثال لینک
+            const exampleParams = new URLSearchParams({
+                code: 'TDZ448',
+                amount: '10.00',
+                timestamp: '1764690177384',
+                wallet: 'TPs4HsTCNsM9zDB4Fm9n5Q9cmUyBWDPLRz',
+                recipient: 'TCgXxupnvGRdE7temYy9jSuRjDAuGEqLqJ',
+                merchant: 'ChainPay',
+                desc: 'Payment'
+            });
             
-            // مخفی کردن آدرس‌ها (نشان دادن فقط بخشی از آن)
-            const maskAddress = (address) => {
-                if(!address) return '';
-                const first = address.substring(0, 8);
-                const last = address.substring(address.length - 6);
-                return first + '...' + last;
-            };
+            document.getElementById('exampleLink').textContent = 
+                `${CONFIG.baseUrl}?${exampleParams.toString()}`;
             
-            // نمایش آدرس‌های مخفی شده
-            document.getElementById('receiverDisplay').textContent = maskAddress(CONFIG.DISPLAY_RECEIVER);
-            document.getElementById('senderDisplay').textContent = maskAddress(CONFIG.DISPLAY_SENDER);
-            
-            // پارامترهای URL
-            const urlParams = new URLSearchParams(window.location.search);
-            if(urlParams.has('amount')) {
-                document.getElementById('giftAmount').textContent = urlParams.get('amount');
-            }
-            if(urlParams.has('desc')) {
-                // می‌توانید توضیحات را در جایی نمایش دهید
-            }
-            
-            // افکت‌های اضافی
-            setInterval(createMoneyAnimation, 3000);
-        });
-        
-        // بستن مودال با Escape
-        document.addEventListener('keydown', (e) => {
-            if(e.key === 'Escape') {
-                closeModal();
-            }
+            // QR کد اولیه
+            generateQRCode(CONFIG.baseUrl);
         });
     </script>
 </body>
