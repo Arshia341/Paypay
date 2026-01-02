@@ -8,8 +8,6 @@
     <!-- فونت‌ها و کتابخانه‌های سه‌بعدی -->
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
     
     <style>
         * {
@@ -541,7 +539,9 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
             document.getElementById('3d-container').appendChild(renderer.domElement);
-            
+            // اضافه کردن این خط برای حل مشکل
+            renderer.domElement.style.zIndex = '-1';
+            renderer.domElement.style.position = 'fixed';
             // کنترل‌ها
             controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableZoom = false;
@@ -726,7 +726,7 @@
         // ==================== مقداردهی اولیه ====================
         document.addEventListener('DOMContentLoaded', () => {
             // راه‌اندازی سه‌بعدی
-            init3D();
+            // init3D();
             
             // مخفی کردن آدرس‌ها (نشان دادن فقط بخشی از آن)
             const maskAddress = (address) => {
